@@ -1,4 +1,5 @@
 import './App.css';
+import Todo from './Todo/Todo';
 import React, { useState } from 'react';
 import {
   Button,
@@ -36,16 +37,17 @@ function App() {
           onClick={addTodo}
           disabled={!input}
           >
-          Primary
+          Add To do
         </Button>
       </form>
       <ul>
         {
           todos.map((todo, i) => (
-            <li key={i}>{todo}</li>
+            <Todo 
+              text={todo}
+            />
           ))
         }
-        <li></li>
       </ul>
     </div>
   );
