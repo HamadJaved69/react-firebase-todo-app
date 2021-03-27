@@ -1,6 +1,8 @@
 import './App.css';
+import db from './firebase';
 import Todo from './Todo/Todo';
-import React, { useState } from 'react';
+import firebase from 'firebase';
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   FormControl,
@@ -9,13 +11,24 @@ import {
 } from '@material-ui/core';
 
 function App() {
-  const [todos, setTodos] = useState(['Take the dogs for a walk', 'Create React Project']);
+  const [todos, setTodos] = useState([]);
   const [input, setInput] = useState('');
 
+  // when the app loads we need to listen to the database and fetch the todos
+  useEffect(() => {
+    //fires when app.js loads
+    db.collection('todos').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+      setTodos(snapshot.docs.map(doc => doc.data().todo));
+    })
+  }, []);
+
   const addTodo = (event) => {
-    console.log(input);
     event.preventDefault();
-    setTodos([...todos, input]);
+    console.log(input);
+    db.collection('todos').add({
+      todo: input,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
     setInput('');
   }
 
@@ -37,13 +50,14 @@ function App() {
           onClick={addTodo}
           disabled={!input}
           >
-          Add To do
+          Add Todo
         </Button>
       </form>
       <ul>
         {
           todos.map((todo, i) => (
-            <Todo 
+            <Todo
+              key={i}
               text={todo}
             />
           ))
